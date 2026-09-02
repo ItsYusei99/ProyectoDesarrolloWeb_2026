@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+/tmp/
+
+# Env
+.env
+.env.local
+
+# Figma
+figma/*.fig
+
+# Composer vendor (optional, keep for now but ignore large)
+# vendor/  # descomenta si prefieres composer install
+
+# Apache
+.htaccess.bak

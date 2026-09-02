@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PKTechnologies - Admin Panel</title>
+    <link rel="stylesheet" href="styles.css?v=20250902_nodes">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-logo">PK</div>
+            <span class="brand-name">PKTechnologies</span>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <canvas id="bg-particles" aria-hidden="true"></canvas>
+        <section class="card">
+            <div class="icon-circle">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                    <polyline points="10 17 15 12 10 7"></polyline>
+                    <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+            </div>
+
+            <h1 class="card-title" id="form-title">Admin Panel</h1>
+            <p class="card-subtitle" id="form-subtitle">Ingrese sus credenciales para continuar</p>
+
+            <div id="alert-box" class="alert hidden"></div>
+
+            <!-- Paso 1: Formulario de Credenciales -->
+            <form id="login-form" novalidate>
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </span>
+                        <input type="text" id="username" placeholder="Ingrese su usuario" autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-wrapper with-toggle">
+                        <span class="input-icon" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </span>
+                        <input type="password" id="password" placeholder="Ingrese su contraseña" autocomplete="current-password">
+                        <button type="button" class="toggle-password" id="toggle-password" aria-label="Mostrar contraseña" tabindex="-1">
+                            <!-- ojo abierto (visible) -->
+                            <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <!-- ojo tachado (oculto) -->
+                            <svg class="eye-closed hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+                                <path d="M9.53 9.53A3 3 0 0 0 12 15a3 3 0 0 0 2.47-5.47"></path>
+                                <path d="M14.12 14.12L9.88 9.88"></path>
+                                <path d="M1 1l22 22"></path>
+                                <path d="M10.58 10.58A2 2 0 0 0 12 14a2 2 0 0 0 1.42-3.42"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-signin">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    <span>Sign In</span>
+                </button>
+            </form>
+
+            <!-- Paso 2: Formulario de Confirmación 2FA - adaptado de React otp-input a vanilla dark -->
+            <form id="otp-form" class="hidden" novalidate>
+                <div class="form-group otp-group">
+                    <label>Código de Verificación (6 dígitos)</label>
+                    <div class="otp-container" id="otp-container" role="group" aria-label="Código de verificación">
+                        <input class="otp-cell" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Código, carácter 1 de 6">
+                        <input class="otp-cell" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Código, carácter 2 de 6">
+                        <input class="otp-cell" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Código, carácter 3 de 6">
+                        <input class="otp-cell group-gap" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Código, carácter 4 de 6">
+                        <input class="otp-cell" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Código, carácter 5 de 6">
+                        <input class="otp-cell" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Código, carácter 6 de 6">
+                    </div>
+                    <div class="otp-hint" id="otp-hint" aria-live="polite"></div>
+                    <input type="hidden" id="otp-code">
+                </div>
+
+                <button type="submit" class="btn-signin">
+                    <span>Confirmar código</span>
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <script src="app.js?v=20250902_nodes"></script>
+</body>
+</html>

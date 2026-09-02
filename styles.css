@@ -1,0 +1,850 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+:root {
+    --bg-deep: #070b1a;
+    --bg-mid: #0f172a;
+    --card-bg: rgba(20, 31, 53, 0.78);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --text-primary: rgba(255, 255, 255, 0.95);
+    --text-secondary: rgba(255, 255, 255, 0.60);
+    --text-tertiary: rgba(255, 255, 255, 0.35);
+    --text-label: rgba(255, 255, 255, 0.75);
+    --input-bg: #0e1a30;
+    --input-bg-hover: #162747;
+    --input-border: #23324e;
+    --input-border-hover: #3a5a8a;
+    --accent: #3b82f6;
+    --accent-strong: #2563eb;
+    --accent-glow: rgba(59, 130, 246, 0.15);
+    --apple-blue: #0a84ff;
+    --apple-focus: rgba(10, 132, 255, 0.28);
+    --apple-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-deep);
+    color: var(--text-primary);
+    overflow-x: hidden;
+}
+
+/* 1. Barra superior - dark glass */
+.topbar {
+    height: 56px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px) saturate(1.2);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    z-index: 10;
+    animation: slideDownTop 0.6s ease-out;
+}
+
+@keyframes slideDownTop {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.brand-logo:hover {
+    transform: scale(1.05) rotate(3deg);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5);
+}
+
+.brand-name {
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+}
+
+/* 2. Fondo degradado oscuro con animación sutil + partículas nodos */
+.main-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 20px;
+    background:
+        radial-gradient(ellipse 900px 600px at 75% 35%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse 700px 500px at 20% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #0a1020 0%, #070b1a 100%);
+    position: relative;
+    perspective: 1000px;
+    perspective-origin: center center;
+    overflow: hidden;
+    animation: bgShift 22s var(--apple-ease) infinite;
+}
+
+@keyframes bgShift {
+    0%, 100% { background-position: 0 0, 0 0, 0 0; }
+    33% { background-position: -18px -10px, 14px 8px, 0 0; }
+    66% { background-position: 12px 6px, -10px -12px, 0 0; }
+}
+
+.main-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0,0,0,0.25) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+#bg-particles {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+}
+
+.main-container > .card {
+    z-index: 2;
+}
+
+/* 3. Tarjeta dark estilo Apple Glassmorphism */
+.card {
+    background: linear-gradient(180deg, rgba(26, 38, 65, 0.85) 0%, var(--card-bg) 100%);
+    backdrop-filter: blur(32px) saturate(190%);
+    -webkit-backdrop-filter: blur(32px) saturate(190%);
+    width: 100%;
+    max-width: 380px;
+    border-radius: 18px;
+    padding: 36px 28px 32px 28px;
+    border: 1px solid var(--card-border);
+    box-shadow:
+        0 30px 60px -12px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.04),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.7s var(--apple-ease);
+    transition: transform 0.35s var(--apple-ease), box-shadow 0.5s ease, border-color 0.4s ease;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    z-index: 3;
+}
+
+/* Brillo que sigue al cursor para efecto 3D - extra sutil */
+.card-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 28%, transparent 62%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    z-index: 2;
+    mix-blend-mode: overlay;
+}
+
+.card.is-tilting .card-glare {
+    opacity: 0.55;
+}
+
+/* Profundidad extra sutil para elementos internos */
+.icon-circle,
+.card-title,
+.card-subtitle,
+form {
+    transform: translateZ(0);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card.is-tilting .icon-circle {
+    transform: translateZ(6px);
+}
+
+.card.is-tilting .card-title {
+    transform: translateZ(4px);
+}
+
+.card.is-tilting .card-subtitle {
+    transform: translateZ(2px);
+}
+
+.card.is-tilting form {
+    transform: translateZ(1px);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 28px 70px -18px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(22px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Ícono circular superior */
+.icon-circle {
+    width: 58px;
+    height: 58px;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+    position: relative;
+    animation: floatIcon 3s ease-in-out infinite, pulseGlow 2.8s infinite;
+}
+
+.icon-circle::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    animation: pingRing 2.8s cubic-bezier(0,0,0.2,1) infinite;
+}
+
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 8px 24px rgba(37,99,235,0.35), inset 0 1px 0 rgba(255,255,255,0.2); }
+    50% { box-shadow: 0 12px 28px rgba(37,99,235,0.45), inset 0 1px 0 rgba(255,255,255,0.25); }
+}
+
+@keyframes pingRing {
+    0% { transform: scale(0.9); opacity: 0.6; }
+    100% { transform: scale(1.35); opacity: 0; }
+}
+
+/* Títulos */
+.card-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    letter-spacing: -0.028em;
+    animation: fadeIn 0.6s ease 0.15s both;
+}
+
+.card-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    text-align: center;
+    letter-spacing: -0.01em;
+    animation: fadeIn 0.6s ease 0.22s both;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Formulario */
+form {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    animation: fadeInUp 0.6s ease both;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.28s; }
+.form-group:nth-child(2) { animation-delay: 0.35s; }
+
+.form-group label {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-label);
+    margin-bottom: 7px;
+    letter-spacing: -0.01em;
+    transition: color 0.25s var(--apple-ease), transform 0.25s var(--apple-ease);
+}
+
+.form-group:focus-within label {
+    color: var(--apple-blue);
+    transform: translateX(1px);
+}
+
+/* Wrapper con iconos - estilo como en captura */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper input {
+    flex: 1;
+    width: 100%;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    pointer-events: none;
+    transition: color 0.25s ease, transform 0.25s ease;
+    z-index: 1;
+}
+
+.input-wrapper:focus-within .input-icon {
+    color: var(--apple-blue);
+}
+
+.input-wrapper:hover .input-icon {
+    color: #93b4ff;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.22s var(--apple-ease);
+    z-index: 2;
+}
+
+.toggle-password:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.toggle-password:active {
+    transform: scale(0.92);
+}
+
+.toggle-password:focus-visible {
+    outline: 2px solid var(--apple-blue);
+    outline-offset: 2px;
+}
+
+.toggle-password:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: transparent;
+}
+
+.toggle-password .eye-closed,
+.toggle-password .eye-open {
+    position: absolute;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.form-group input {
+    height: 44px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 11px;
+    padding: 0 14px;
+    font-size: 13.5px;
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.25s var(--apple-ease);
+    position: relative;
+}
+
+.input-wrapper input {
+    padding-left: 40px;
+    padding-right: 14px;
+}
+
+.input-wrapper.with-toggle input {
+    padding-right: 42px;
+}
+
+/* Hover sutil pedido */
+.form-group input:hover {
+    background-color: var(--input-bg-hover);
+    border-color: var(--input-border-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255,255,255,0.03);
+}
+
+.form-group input::placeholder {
+    color: var(--text-tertiary);
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.form-group input:hover::placeholder {
+    color: var(--text-secondary);
+}
+
+.form-group input:focus {
+    background-color: #12213d;
+    border-color: var(--apple-blue);
+    box-shadow: 0 0 0 3.5px var(--apple-focus), 0 6px 18px rgba(10, 132, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.form-group input:focus::placeholder {
+    transform: translateX(2px);
+    opacity: 0.7;
+}
+
+.form-group input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Botón Sign In con animaciones y física de resorte Apple */
+.btn-signin {
+    width: 100%;
+    height: 44px;
+    background: linear-gradient(135deg, #0a84ff, #0066cc);
+    color: #ffffff;
+    border: none;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: 0 6px 18px rgba(10, 132, 255, 0.32), inset 0 1px 0 rgba(255,255,255,0.22);
+    transition: all 0.25s var(--apple-ease);
+    animation: fadeInUp 0.6s ease 0.42s both;
+}
+
+.btn-signin::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+    transform: translateX(-110%);
+    transition: transform 0.6s ease;
+    z-index: -1;
+}
+
+.btn-signin:hover::before {
+    transform: translateX(110%);
+}
+
+.btn-signin:hover {
+    background: linear-gradient(135deg, #1f8fff, #0070e0);
+    transform: translateY(-1.5px);
+    box-shadow: 0 10px 24px rgba(10, 132, 255, 0.42), inset 0 1px 0 rgba(255,255,255,0.28);
+}
+
+.btn-signin:active {
+    transform: scale(0.965);
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.25);
+    transition: transform 0.1s var(--apple-ease);
+}
+
+.btn-signin:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-signin svg {
+    transition: transform 0.3s ease;
+}
+
+.btn-signin:hover svg {
+    transform: translateX(2px);
+}
+
+/* Alertas dark + animación */
+.alert {
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: 500;
+    animation: alertIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(8px);
+}
+
+@keyframes alertIn {
+    from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.alert.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.22);
+    box-shadow: 0 4px 16px rgba(239,68,68,0.12);
+}
+
+.alert.success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #86efac;
+    border: 1px solid rgba(34, 197, 94, 0.22);
+    box-shadow: 0 4px 16px rgba(34,197,94,0.12);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Vibración suave en error */
+@keyframes shake {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    10% { transform: translate3d(-5px, 0, 0); }
+    20% { transform: translate3d(5px, 0, 0); }
+    30% { transform: translate3d(-4px, 0, 0); }
+    40% { transform: translate3d(4px, 0, 0); }
+    50% { transform: translate3d(-2px, 0, 0); }
+    60% { transform: translate3d(2px, 0, 0); }
+    70% { transform: translate3d(-1px, 0, 0); }
+    80% { transform: translate3d(1px, 0, 0); }
+    90% { transform: translate3d(-0.5px, 0, 0); }
+}
+
+.card.shake {
+    animation: shake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    will-change: transform;
+    border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+/* Input error pulse al hacer shake */
+.card.shake .form-group input {
+    border-color: rgba(239, 68, 68, 0.4);
+    animation: inputErrorPulse 0.55s ease;
+}
+
+@keyframes inputErrorPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    50% { box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
+}
+
+/* Transición suave entre formularios login/otp */
+#login-form, #otp-form {
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+#login-form.hidden, #otp-form.hidden {
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+}
+
+/* Autofill dark */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #e2e8f0;
+    -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset;
+    transition: background-color 9999s ease-in-out 0s;
+    caret-color: #e2e8f0;
+}
+
+/* Inicio / Dashboard - mismo tema azul dark */
+.topbar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #ff6961;
+    background: rgba(255, 69, 58, 0.1);
+    border: 1px solid rgba(255, 69, 58, 0.22);
+    padding: 6px 12px;
+    border-radius: 9px;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.25s var(--apple-ease);
+}
+
+.btn-logout:hover {
+    background: rgba(255, 69, 58, 0.18);
+    border-color: rgba(255, 69, 58, 0.35);
+    color: #ff857d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 69, 58, 0.18);
+}
+
+.btn-logout:active {
+    transform: scale(0.96);
+}
+
+.welcome-card {
+    max-width: 520px;
+    text-align: center;
+}
+
+.icon-success {
+    background: linear-gradient(135deg, #0a84ff, #0066cc) !important;
+    box-shadow: 0 8px 24px rgba(10, 132, 255, 0.35), inset 0 1px 0 rgba(255,255,255,0.25) !important;
+}
+
+/* Animación de checkmark dibujado estilo Face ID / Apple Pay */
+.icon-success svg polyline,
+.icon-success svg path {
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
+    animation: drawCheck 0.5s 0.18s var(--apple-ease) forwards;
+}
+
+@keyframes drawCheck {
+    to { stroke-dashoffset: 0; }
+}
+
+.info-panel {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    padding: 8px 16px;
+    margin-top: 18px;
+    text-align: left;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 13px;
+    gap: 12px;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 12.5px;
+    letter-spacing: -0.01em;
+}
+
+.info-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 13px;
+    text-align: right;
+    letter-spacing: -0.01em;
+    word-break: break-all;
+}
+
+.welcome-actions {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.welcome-actions .btn-signin {
+    animation-delay: 0.45s;
+}
+
+/* OTP 6 celdas - adaptado con Apple HIG */
+.otp-group {
+    align-items: center;
+}
+
+.otp-container {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 6px;
+    position: relative;
+}
+
+.otp-container.shake {
+    animation: shake 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+.otp-cell {
+    width: 42px;
+    height: 48px;
+    border-radius: 11px;
+    border: 1.8px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: -0.01em;
+    outline: none;
+    caret-color: var(--apple-blue);
+    transition: all 0.2s var(--apple-ease);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.otp-cell::selection {
+    background: transparent;
+}
+
+.otp-cell:hover {
+    border-color: var(--input-border-hover);
+    background: var(--input-bg-hover);
+    transform: translateY(-1px);
+}
+
+.otp-cell:focus {
+    border-color: var(--apple-blue);
+    background: #12213d;
+    box-shadow: 0 0 0 3.5px var(--apple-focus), 0 4px 14px rgba(10, 132, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.otp-cell:active {
+    transform: scale(0.96);
+    transition: transform 0.1s var(--apple-ease);
+}
+
+.otp-cell.filled {
+    border-color: #334155;
+    background: var(--input-bg);
+}
+
+.otp-cell.filled:focus {
+    border-color: var(--apple-blue);
+}
+
+.otp-cell.error {
+    border-color: #ff453a !important;
+    background: rgba(255, 69, 58, 0.08) !important;
+    box-shadow: 0 0 0 3.5px rgba(255, 69, 58, 0.22) !important;
+    color: #ffb4ab;
+}
+
+.otp-cell.success {
+    border-color: #30d158 !important;
+    background: rgba(48, 209, 88, 0.08) !important;
+    box-shadow: 0 0 0 3.5px rgba(48, 209, 88, 0.22) !important;
+}
+
+.otp-cell:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.otp-cell.group-gap {
+    margin-left: 12px;
+}
+
+/* Animación de entrada del carácter con resortes Apple */
+@keyframes otpIn {
+    from { opacity: 0; transform: scale(0.90) translateY(4px); filter: blur(3px); }
+    to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+
+.otp-cell.otp-enter {
+    animation: otpIn 0.22s var(--apple-ease);
+}
+
+.otp-hint {
+    margin-top: 10px;
+    min-height: 16px;
+    font-size: 11.5px;
+    line-height: 16px;
+    text-align: center;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+}
+
+.otp-hint.error {
+    color: #ff857d;
+}
+
+.otp-hint.success {
+    color: #6ee7b7;
+}
+
+.otp-hint:empty {
+    opacity: 0;
+}
