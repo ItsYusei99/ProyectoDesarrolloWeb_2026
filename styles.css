@@ -947,6 +947,13 @@ input:-webkit-autofill:focus {
 /* Módulo usuarios */
 .wide-card {
     width: min(860px, 100%);
+    max-width: 860px;
+    align-items: stretch;
+}
+
+.main-container.page-wide {
+    align-items: flex-start;
+    overflow-y: auto;
 }
 
 .table-toolbar {
@@ -983,10 +990,19 @@ input:-webkit-autofill:focus {
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+    white-space: nowrap;
 }
 
 .data-table td {
     color: var(--text-primary);
+}
+
+.data-table td:nth-child(3) {
+    word-break: break-all;
+}
+
+.data-table td:nth-child(4) {
+    white-space: nowrap;
 }
 
 .row-actions {

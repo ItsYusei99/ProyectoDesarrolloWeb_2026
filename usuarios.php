@@ -8,7 +8,7 @@ require_auth();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PKTechnologies - Usuarios</title>
-    <link rel="stylesheet" href="styles.css?v=20250902_nodes">
+    <link rel="stylesheet" href="styles.css?v=20250903a">
 </head>
 <body>
     <header class="topbar">
@@ -22,7 +22,7 @@ require_auth();
         </div>
     </header>
 
-    <main class="main-container">
+    <main class="main-container page-wide">
         <section class="card wide-card">
             <h1 class="card-title">Administración de Usuarios</h1>
             <p class="card-subtitle">Crear, consultar, modificar y eliminar usuarios</p>
