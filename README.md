@@ -23,9 +23,19 @@ Para forzar sinc manual:
 /Users/yuseigarcia/WEB/sync_dual.sh
 ```
 
-**Credenciales de prueba:**
+**Credenciales de prueba (solo entorno académico):**
 - `admin / Password123` → jodidroks@gmail.com
 - `admin / Admin2026!` → soporte@tecnosoluciones.com
+
+**Seguridad (mejoras aplicadas):**
+- Secretos (BD y SMTP) en `.env` (no versionado). Copiar `.env.example` a `.env` y rellenar.
+- Hashes bcrypt con migración automática desde SHA-256+salt legado.
+- 2FA: OTP de 6 dígitos, 5 min, un solo uso, comparación `hash_equals`, límite 5 intentos + bloqueo 15 min.
+- Sesiones: `session_regenerate_id`, timeout 30 min inactividad, cookies `HttpOnly` + `SameSite=Lax`, logout POST con CSRF (GET por compatibilidad).
+- Endpoints: `login.php` / `verificacion.php` (`verify_otp.php` es alias). Panel: `inicio.php` (`dashboard.php` redirige ahí).
+- Headers: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` en `.htaccess`.
+- `vendor/` no se versiona: desplegar con `composer install`.
+- Reportes universitarios en `reportes/`.
 
 **VM:**
 - `multipass start ubuntuserver`

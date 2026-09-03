@@ -96,6 +96,10 @@
                         <input class="otp-cell" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Código, carácter 6 de 6">
                     </div>
                     <div class="otp-hint" id="otp-hint" aria-live="polite"></div>
+                    <div class="otp-resend">
+                        <span id="otp-timer" aria-live="polite"></span>
+                        <button type="button" id="resend-otp" class="link-button">Reenviar código</button>
+                    </div>
                     <input type="hidden" id="otp-code">
                 </div>
 

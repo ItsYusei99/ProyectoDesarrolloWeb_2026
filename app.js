@@ -1,4 +1,8 @@
 let currentUserId = null;
+let lastUsername = null;
+let lastPassword = null;
+let otpTimerId = null;
+const OTP_TTL_SECS = 300;
 
 document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById("login-form");
@@ -226,6 +230,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.status === "otp_required") {
                 currentUserId = data.user_id;
+                // Se guardan solo en memoria para el botón "Reenviar código"
+                lastUsername = username;
+                lastPassword = password;
 
                 loginForm.classList.add("hidden");
                 otpForm.classList.remove("hidden");
@@ -233,17 +240,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 formTitle.textContent = "Verificación 2FA";
                 formSubtitle.textContent = `Revise su correo (${data.email_masked}) e introduzca el código.`;
 
-                // Mostrar OTP en UI para debug si el correo no llega (solo desarrollo)
-                let msg = data.message;
-                if (data.debug_otp) {
-                    msg += ` (OTP pruebas: ${data.debug_otp})`;
-                    console.log("[DEBUG OTP]", data.debug_otp, "para", data.email_masked, "mail_sent:", data.mail_sent);
-                }
-                showAlert(msg, "success");
+                // El OTP solo viaja por correo: nunca se muestra en UI ni consola.
+                showAlert(data.message, "success");
                 // Inicializa celdas OTP vanilla (sin motion)
                 clearOtpCells();
                 setOtpStatus("idle", `Código enviado a ${data.email_masked}`);
                 setTimeout(() => focusOtpAt(0), 100);
+                startOtpCountdown();
             } else {
                 showAlert(data.message || "Usuario o contraseña incorrectos.", "error");
                 triggerShake();
@@ -313,6 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (data.status === "success") {
+                if (otpTimerId) clearInterval(otpTimerId);
                 setOtpStatus("success", data.message || "Código aceptado.");
                 showAlert("Acceso permitido. Redirirgiendo...", "success");
                 otpCells.forEach(c => { c.disabled = true; c.classList.add("success"); });
@@ -633,5 +637,57 @@ document.addEventListener("DOMContentLoaded", () => {
         alertBox.textContent = msg;
         alertBox.className = `alert ${type}`;
         alertBox.classList.remove("hidden");
+    }
+
+    // Cuenta regresiva de 5:00 del OTP + botón Reenviar código
+    function startOtpCountdown() {
+        const timerEl = document.getElementById("otp-timer");
+        const resendBtn = document.getElementById("resend-otp");
+        if (otpTimerId) clearInterval(otpTimerId);
+        let remaining = OTP_TTL_SECS;
+        const render = () => {
+            if (!timerEl) return;
+            const m = Math.floor(remaining / 60);
+            const s = String(remaining % 60).padStart(2, "0");
+            timerEl.textContent = remaining > 0
+                ? `El código vence en ${m}:${s}`
+                : "El código venció. Solicite uno nuevo.";
+        };
+        render();
+        if (resendBtn) resendBtn.disabled = false;
+        otpTimerId = setInterval(() => {
+            remaining--;
+            render();
+            if (remaining <= 0) clearInterval(otpTimerId);
+        }, 1000);
+    }
+
+    const resendBtn = document.getElementById("resend-otp");
+    if (resendBtn) {
+        resendBtn.addEventListener("click", async () => {
+            if (!lastUsername || !lastPassword) return;
+            resendBtn.disabled = true;
+            try {
+                const res = await fetch("login.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username: lastUsername, password: lastPassword })
+                });
+                const data = await res.json();
+                if (data.status === "otp_required") {
+                    currentUserId = data.user_id;
+                    clearOtpCells();
+                    setOtpStatus("idle", `Nuevo código enviado a ${data.email_masked}`);
+                    showAlert(data.message, "success");
+                    startOtpCountdown();
+                } else {
+                    showAlert(data.message || "No se pudo reenviar el código.", "error");
+                    resendBtn.disabled = false;
+                }
+            } catch (err) {
+                showAlert("Error al reenviar el código.", "error");
+                resendBtn.disabled = false;
+            }
+        });
     }
 });

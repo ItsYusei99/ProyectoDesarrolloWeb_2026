@@ -1,9 +1,6 @@
 <?php
-session_start();
-if (!isset($_SESSION["authenticated"]) || $_SESSION["authenticated"] !== true) {
-    header("Location: index.html");
-    exit;
-}
+require_once __DIR__ . '/session.php';
+require_auth();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -58,12 +55,15 @@ if (!isset($_SESSION["authenticated"]) || $_SESSION["authenticated"] !== true) {
             </div>
 
             <div class="welcome-actions">
-                <a href="logout.php" class="btn-signin" style="text-decoration:none;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    <span>Cerrar sesión</span>
-                </a>
+                <form action="logout.php" method="post" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                    <button type="submit" class="btn-signin">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        <span>Cerrar sesión</span>
+                    </button>
+                </form>
             </div>
         </section>
     </main>
