@@ -1,43 +1,45 @@
-# PKTechnologies - ProyectoDiseñoWeb (copia sincronizada con Ubuntu)
+# PKTechnologies - Proyecto de Diseño de Aplicaciones Web
 
-Esta carpeta es una copia directa de `/var/www/html` (y `/var/www/misitio.local/public_html` via symlink) del servidor Ubuntu `ubuntuserver` (192.168.252.3).
+Este es mi proyecto de la materia de Diseño de aplicaciones web (7mo semestre, Tecmilenio campus Toluca, con el profe Bruno Reyes Valle).
 
-**Montaje activo:**
-- Host: `/Users/yuseigarcia/WEB/ProyectoDiseñoWeb_Server` 
-- VM: `ubuntuserver:/var/www/html` (y symlink `/var/www/misitio.local/public_html -> /var/www/html`)
-- Tipo: `classic` sshfs via `multipass mount`
+Es un panel de administración con inicio de sesión en dos pasos: primero validas tu usuario y contraseña contra MySQL, y después te llega un código de 6 dígitos a tu correo que tienes que meter para entrar. El código dura 5 minutos y solo se puede usar una vez.
 
-**Uso en VS Code:**
-```
-code /Users/yuseigarcia/WEB/ProyectoDiseñoWeb_Server
-```
-Cualquier edición aquí se refleja instantáneamente en Ubuntu (sin necesidad de `multipass transfer`). Para ver cambios en `http://192.168.252.3` o `http://misitio.local` basta guardar y recargar (ya con `styles.css?v=20250901e` y headers no-cache).
+## Cómo lo tengo montado
 
-**Sincronización dual futura:**
-El asistente editará simultáneamente:
-- Este directorio (montado) → auto-sync a Ubuntu
-- Copia de respaldo `/Users/yuseigarcia/WEB/ProyectoDiseñoWeb/` (via rsync)
+Lo corro en una máquina virtual de Ubuntu que se llama `ubuntuserver` (la hice con multipass). Esta carpeta está montada directo en `/var/www/html` de la VM, entonces todo lo que edito aquí se refleja solo allá, no tengo que estar copiando archivos.
 
-Para forzar sinc manual:
+Para prenderla y ver el sitio:
+
 ```bash
-/Users/yuseigarcia/WEB/sync_dual.sh
+multipass start ubuntuserver
+multipass info ubuntuserver   # ahí sale la IP
 ```
 
-**Credenciales de prueba (solo entorno académico):**
-- `admin / Password123` → jodidroks@gmail.com
-- `admin / Admin2026!` → soporte@tecnosoluciones.com
+Y en el navegador abres `http://192.168.252.3`. Si cambias algo, con recargar la página basta.
 
-**Seguridad (mejoras aplicadas):**
-- Secretos (BD y SMTP) en `.env` (no versionado). Copiar `.env.example` a `.env` y rellenar.
-- Hashes bcrypt con migración automática desde SHA-256+salt legado.
-- 2FA: OTP de 6 dígitos, 5 min, un solo uso, comparación `hash_equals`, límite 5 intentos + bloqueo 15 min.
-- Sesiones: `session_regenerate_id`, timeout 30 min inactividad, cookies `HttpOnly` + `SameSite=Lax`, logout POST con CSRF (GET por compatibilidad).
-- Endpoints: `login.php` / `verificacion.php` (`verify_otp.php` es alias). Panel: `inicio.php` (`dashboard.php` redirige ahí).
-- Headers: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` en `.htaccess`.
-- `vendor/` no se versiona: desplegar con `composer install`.
-- Reportes universitarios en `reportes/`.
+## Si lo quieres correr tú
 
-**VM:**
-- `multipass start ubuntuserver`
-- `multipass info ubuntuserver` (ver mounts)
-- `multipass exec ubuntuserver -- sudo systemctl reload apache2`
+1. Instala las dependencias con `composer install` (la carpeta `vendor/` no la subí al repo).
+2. Copia `.env.example` a `.env` y pon tus datos de la base y del correo SMTP ahí.
+3. La base se llama `auth_system`, la tabla es `usuarios`. El proyecto ya espera esas columnas (incluyendo `otp_code` y `otp_expires_at`).
+
+## Usuarios de prueba
+
+Los dejé para que el profe pueda calificar sin registrar nada:
+
+- `admin / Password123`
+- `admin / Admin2026!`
+
+(Sí, los dos se llaman igual a propósito, en el Reporte 4 pedían soportar homónimos.)
+
+## Qué hay en el repo
+
+- `index.html`, `app.js`, `styles.css` → el login y la pantalla del código.
+- `login.php` → revisa usuario/contraseña y manda el código por correo.
+- `verificacion.php` → revisa el código y crea la sesión (`verify_otp.php` es solo un alias por compatibilidad).
+- `inicio.php` → la página principal cuando ya entraste (`dashboard.php` solo redirige ahí).
+- `logout.php`, `session.php`, `config.php` → sesiones y configuración.
+- `reportes/` → mis reportes de la materia en Word.
+- `figma/` → cosas del diseño.
+
+Youssef Nabil Khalil Garcia — 3086048
