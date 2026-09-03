@@ -3,19 +3,14 @@ let lastUsername = null;
 let lastPassword = null;
 let otpTimerId = null;
 const OTP_TTL_SECS = 300;
+const OTP_LENGTH = 6;
 
 document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById("login-form");
     const otpForm = document.getElementById("otp-form");
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
-    // Widget OTP 6 celdas vanilla reutilizable (login y registro usan el mismo diseño)
-    // Adaptado de React otp-input sin dependencias pesadas: usa CSS vanilla y lógica similar a useOtpInput
-    function createOtpWidget(containerId, hiddenId, hintId) {
-    const otpContainer = document.getElementById(containerId);
-    const otpCells = otpContainer ? Array.from(otpContainer.querySelectorAll(".otp-cell")) : [];
-    const otpHint = document.getElementById(hintId);
-    const otpInput = document.getElementById(hiddenId); // hidden para compatibilidad
+    // OTP 6 celdas vanilla (adaptado de React otp-input sin dependencias pesadas)
     const alertBox = document.getElementById("alert-box");
     const formTitle = document.getElementById("form-title");
     const formSubtitle = document.getElementById("form-subtitle");
@@ -57,8 +52,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ---- OTP 6 celdas vanilla (adaptación indispensable del React otp-input) ----
+    // ---- Widget OTP 6 celdas vanilla reutilizable (login y registro usan el mismo diseño) ----
     // No requiere shadcn / Tailwind / motion: usa CSS vanilla y lógica similar a useOtpInput
+    function createOtpWidget(containerId, hiddenId, hintId) {
+    const otpContainer = document.getElementById(containerId);
+    const otpCells = otpContainer ? Array.from(otpContainer.querySelectorAll(".otp-cell")) : [];
+    const otpHint = document.getElementById(hintId);
+    const otpInput = document.getElementById(hiddenId); // hidden para compatibilidad
     const OTP_LENGTH = 6;
     const OTP_ALLOW = /^[0-9]$/;
     const getOtpValue = () => otpCells.map(c => c.value).join("");
