@@ -22,3 +22,6 @@ figma/*.fig
 
 # Reportes PDF generados (los .docx sí se versionan en reportes/)
 reportes/*.pdf
+
+# Capturas locales (evidencia ya incrustada en los .docx, no se versionan)
+imagenes/
