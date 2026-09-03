@@ -4,6 +4,8 @@ Este es mi proyecto de la materia de Diseño de aplicaciones web (7mo semestre, 
 
 Es un panel de administración con inicio de sesión en dos pasos: primero validas tu usuario y contraseña contra MySQL, y después te llega un código de 6 dígitos a tu correo que tienes que meter para entrar. El código dura 5 minutos y solo se puede usar una vez.
 
+Ya adentro hay un menú principal con tres cosas: Usuarios (para crear, ver, modificar y eliminar usuarios), Perfil (tus datos) y Cerrar sesión.
+
 ## Cómo lo tengo montado
 
 Lo corro en una máquina virtual de Ubuntu que se llama `ubuntuserver` (al usar MacOS la hice con multipass). Esta carpeta está montada directo en `/var/www/html` de la VM, entonces todo lo que edito aquí se refleja solo allá, no tengo que estar copiando archivos.
