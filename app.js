@@ -291,8 +291,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 setTimeout(async () => {
                     await Promise.all([
-                        eraseLetterByLetter(usernameInput, 35),
-                        eraseLetterByLetter(passwordInput, 35)
+                        eraseLetterByLetter(usernameInput, 70),
+                        eraseLetterByLetter(passwordInput, 70)
                     ]);
                     // Resetear ojo a estado oculto por seguridad
                     if (passwordInput.type === "text") {
@@ -370,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         loginOtp.cells[i].dataset.prev = "";
                         loginOtp.cells[i].classList.remove("filled", "success", "error", "otp-enter");
                         loginOtp.sync();
-                        await new Promise(r => setTimeout(r, 35));
+                        await new Promise(r => setTimeout(r, 70));
                     }
                     loginOtp.cells.forEach(c => c.disabled = false);
                     if (submitBtnOtp) submitBtnOtp.disabled = false;
@@ -384,7 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    function eraseLetterByLetter(input, interval = 35) {
+    function eraseLetterByLetter(input, interval = 70) {
         return new Promise((resolve) => {
             if (!input.value) {
                 resolve();
@@ -813,7 +813,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     regOtp.cells[i].dataset.prev = "";
                     regOtp.cells[i].classList.remove("filled", "success", "error", "otp-enter");
                     regOtp.sync();
-                    await new Promise(r => setTimeout(r, 35));
+                    await new Promise(r => setTimeout(r, 70));
                 }
                 regOtp.cells.forEach(c => c.disabled = false);
                 if (submitBtnReg) submitBtnReg.disabled = false;
