@@ -6,7 +6,7 @@ Es un panel de administración con inicio de sesión en dos pasos: primero valid
 
 ## Cómo lo tengo montado
 
-Lo corro en una máquina virtual de Ubuntu que se llama `ubuntuserver` (la hice con multipass). Esta carpeta está montada directo en `/var/www/html` de la VM, entonces todo lo que edito aquí se refleja solo allá, no tengo que estar copiando archivos.
+Lo corro en una máquina virtual de Ubuntu que se llama `ubuntuserver` (al usar MacOS la hice con multipass). Esta carpeta está montada directo en `/var/www/html` de la VM, entonces todo lo que edito aquí se refleja solo allá, no tengo que estar copiando archivos.
 
 Para prenderla y ver el sitio:
 
@@ -42,4 +42,4 @@ Los dejé para que el profe pueda calificar sin registrar nada:
 - `reportes/` → mis reportes de la materia en Word.
 - `figma/` → cosas del diseño.
 
-Youssef Nabil Khalil Garcia — 3086048
+
