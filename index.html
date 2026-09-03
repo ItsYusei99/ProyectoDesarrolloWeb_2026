@@ -199,13 +199,24 @@
                 </div>
             </form>
 
-            <!-- Paso: confirmar cuenta con el código del correo -->
+            <!-- Paso: confirmar cuenta con el código del correo (mismo diseño 6 celdas que el login) -->
             <form id="register-confirm-form" class="hidden" novalidate>
-                <div class="form-group">
-                    <label for="reg-code">Código de 6 dígitos</label>
-                    <div class="input-wrapper">
-                        <input type="text" id="reg-code" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+                <div class="form-group otp-group">
+                    <label>Código de Verificación (6 dígitos)</label>
+                    <div class="otp-container" id="reg-otp-container" role="group" aria-label="Código de verificación">
+                        <input class="otp-cell" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Código, carácter 1 de 6">
+                        <input class="otp-cell" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Código, carácter 2 de 6">
+                        <input class="otp-cell" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Código, carácter 3 de 6">
+                        <input class="otp-cell group-gap" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Código, carácter 4 de 6">
+                        <input class="otp-cell" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Código, carácter 5 de 6">
+                        <input class="otp-cell" type="text" inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Código, carácter 6 de 6">
                     </div>
+                    <div class="otp-hint" id="reg-otp-hint" aria-live="polite"></div>
+                    <div class="otp-resend">
+                        <span id="reg-otp-timer" aria-live="polite"></span>
+                        <button type="button" id="resend-reg" class="link-button">Reenviar código</button>
+                    </div>
+                    <input type="hidden" id="reg-otp-code">
                 </div>
                 <button type="submit" class="btn-signin">
                     <span>Confirmar cuenta</span>

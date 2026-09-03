@@ -586,11 +586,11 @@ form {
 }
 
 /* Transición suave entre formularios login/otp */
-#login-form, #otp-form {
+#login-form, #otp-form, #forgot-form, #reset-form, #register-form, #register-confirm-form {
     transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
-#login-form.hidden, #otp-form.hidden {
+#login-form.hidden, #otp-form.hidden, #forgot-form.hidden, #reset-form.hidden, #register-form.hidden, #register-confirm-form.hidden {
     opacity: 0;
     transform: translateY(6px);
     pointer-events: none;
@@ -860,7 +860,7 @@ input:-webkit-autofill:focus {
     color: var(--text-secondary);
 }
 
-#otp-timer {
+#otp-timer, #reg-otp-timer {
     min-height: 16px;
 }
 

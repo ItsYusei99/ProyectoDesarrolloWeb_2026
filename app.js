@@ -9,11 +9,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const otpForm = document.getElementById("otp-form");
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
-    // OTP 6 celdas vanilla (adaptado de React otp-input sin dependencias pesadas)
-    const otpContainer = document.getElementById("otp-container");
+    // Widget OTP 6 celdas vanilla reutilizable (login y registro usan el mismo diseño)
+    // Adaptado de React otp-input sin dependencias pesadas: usa CSS vanilla y lógica similar a useOtpInput
+    function createOtpWidget(containerId, hiddenId, hintId) {
+    const otpContainer = document.getElementById(containerId);
     const otpCells = otpContainer ? Array.from(otpContainer.querySelectorAll(".otp-cell")) : [];
-    const otpHint = document.getElementById("otp-hint");
-    const otpInput = document.getElementById("otp-code"); // hidden para compatibilidad
+    const otpHint = document.getElementById(hintId);
+    const otpInput = document.getElementById(hiddenId); // hidden para compatibilidad
     const alertBox = document.getElementById("alert-box");
     const formTitle = document.getElementById("form-title");
     const formSubtitle = document.getElementById("form-subtitle");
@@ -26,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const registerConfirmForm = document.getElementById("register-confirm-form");
     let resetEmail = null;
     let registerEmail = null;
+    let lastReg = null;
 
     // Router de vistas: solo una visible, enlaces solo en el login
     function showView(name, title, subtitle) {
@@ -216,6 +219,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    return {
+        cells: otpCells,
+        value: getOtpValue,
+        sync: syncHiddenOtp,
+        status: setOtpStatus,
+        focus: focusOtpAt,
+        clear: clearOtpCells
+    };
+    }
+
+    const loginOtp = createOtpWidget("otp-container", "otp-code", "otp-hint");
+    const regOtp = createOtpWidget("reg-otp-container", "reg-otp-code", "reg-otp-hint");
+
     loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -259,10 +275,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 // El OTP solo viaja por correo: nunca se muestra en UI ni consola.
                 showAlert(data.message, "success");
                 // Inicializa celdas OTP vanilla (sin motion)
-                clearOtpCells();
-                setOtpStatus("idle", `Código enviado a ${data.email_masked}`);
-                setTimeout(() => focusOtpAt(0), 100);
-                startOtpCountdown();
+                loginOtp.clear();
+                loginOtp.status("idle", `Código enviado a ${data.email_masked}`);
+                setTimeout(() => loginOtp.focus(0), 100);
+                startOtpCountdown("otp-timer", "resend-otp");
             } else {
                 showAlert(data.message || "Usuario o contraseña incorrectos.", "error");
                 triggerShake();
@@ -305,11 +321,11 @@ document.addEventListener("DOMContentLoaded", () => {
     otpForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const otp = getOtpValue().trim();
-        syncHiddenOtp();
+        const otp = loginOtp.value().trim();
+        loginOtp.sync();
         if (otp.length !== 6) {
             showAlert("El código debe tener 6 dígitos.", "error");
-            setOtpStatus("error", "El código debe tener 6 dígitos.");
+            loginOtp.status("error", "El código debe tener 6 dígitos.");
             triggerShake();
             return;
         }
@@ -333,33 +349,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.status === "success") {
                 if (otpTimerId) clearInterval(otpTimerId);
-                setOtpStatus("success", data.message || "Código aceptado.");
+                loginOtp.status("success", data.message || "Código aceptado.");
                 showAlert("Acceso permitido. Redirirgiendo...", "success");
-                otpCells.forEach(c => { c.disabled = true; c.classList.add("success"); });
+                loginOtp.cells.forEach(c => { c.disabled = true; c.classList.add("success"); });
                 setTimeout(() => {
                     window.location.href = data.redirect;
                 }, 600);
             } else {
                 showAlert(data.message || "Codigo incorrecto.", "error");
-                setOtpStatus("error", data.message || "Código incorrecto.");
+                loginOtp.status("error", data.message || "Código incorrecto.");
                 triggerShake();
                 // Borrado celda por celda rápido (adaptado de React clear)
                 const submitBtnOtp = otpForm.querySelector('button[type="submit"]');
-                otpCells.forEach(c => c.disabled = true);
+                loginOtp.cells.forEach(c => c.disabled = true);
                 if (submitBtnOtp) submitBtnOtp.disabled = true;
 
                 setTimeout(async () => {
                     for (let i = OTP_LENGTH - 1; i >= 0; i--) {
-                        otpCells[i].value = "";
-                        otpCells[i].dataset.prev = "";
-                        otpCells[i].classList.remove("filled", "success", "error", "otp-enter");
-                        syncHiddenOtp();
+                        loginOtp.cells[i].value = "";
+                        loginOtp.cells[i].dataset.prev = "";
+                        loginOtp.cells[i].classList.remove("filled", "success", "error", "otp-enter");
+                        loginOtp.sync();
                         await new Promise(r => setTimeout(r, 35));
                     }
-                    otpCells.forEach(c => c.disabled = false);
+                    loginOtp.cells.forEach(c => c.disabled = false);
                     if (submitBtnOtp) submitBtnOtp.disabled = false;
-                    setOtpStatus("idle", "");
-                    focusOtpAt(0);
+                    loginOtp.status("idle", "");
+                    loginOtp.focus(0);
                 }, 180);
             }
         } catch (err) {
@@ -745,8 +761,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await postJSON("register.php", { action: "request", nombre, email, password: p1 });
         if (data.status === "code_sent") {
             registerEmail = email;
+            lastReg = { nombre, email, password: p1 };
             showView("confirm", "Confirmar cuenta", `Enviamos un código a ${data.email_masked || email}. Introdúcelo para activar tu cuenta.`);
             showAlert(data.message, "success");
+            regOtp.clear();
+            regOtp.status("idle", `Código enviado a ${data.email_masked || email}`);
+            setTimeout(() => regOtp.focus(0), 100);
+            startOtpCountdown("reg-otp-timer", "resend-reg");
         } else {
             showAlert(data.message || "No se pudo registrar.", "error");
             triggerShake();
@@ -755,25 +776,75 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (registerConfirmForm) registerConfirmForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const code = document.getElementById("reg-code").value.trim();
+        const code = regOtp.value().trim();
+        regOtp.sync();
         const email = registerEmail || document.getElementById("reg-email").value.trim();
         if (!/^\d{6}$/.test(code)) {
             showAlert("El código debe tener 6 dígitos.", "error");
+            regOtp.status("error", "El código debe tener 6 dígitos.");
             triggerShake();
             return;
         }
         const data = await postJSON("register.php", { action: "confirm", email, code });
         if (data.status === "success") {
+            if (otpTimerId) clearInterval(otpTimerId);
+            regOtp.status("success", data.message || "Cuenta confirmada.");
+            showAlert("Cuenta creada. Redirigiendo al inicio...", "success");
+            regOtp.cells.forEach(c => { c.disabled = true; c.classList.add("success"); });
             registerEmail = null;
+            lastReg = null;
             registerForm.reset();
-            registerConfirmForm.reset();
-            showView("login", "Admin Panel", "Ingrese sus credenciales para continuar");
-            showAlert(data.message, "success");
+            setTimeout(() => {
+                registerConfirmForm.reset();
+                regOtp.cells.forEach(c => c.disabled = false);
+                showView("login", "Admin Panel", "Ingrese sus credenciales para continuar");
+                showAlert(data.message, "success");
+            }, 600);
         } else {
             showAlert(data.message || "No se pudo confirmar.", "error");
+            regOtp.status("error", data.message || "Código incorrecto.");
             triggerShake();
+            const submitBtnReg = registerConfirmForm.querySelector('button[type="submit"]');
+            regOtp.cells.forEach(c => c.disabled = true);
+            if (submitBtnReg) submitBtnReg.disabled = true;
+            setTimeout(async () => {
+                for (let i = OTP_LENGTH - 1; i >= 0; i--) {
+                    regOtp.cells[i].value = "";
+                    regOtp.cells[i].dataset.prev = "";
+                    regOtp.cells[i].classList.remove("filled", "success", "error", "otp-enter");
+                    regOtp.sync();
+                    await new Promise(r => setTimeout(r, 35));
+                }
+                regOtp.cells.forEach(c => c.disabled = false);
+                if (submitBtnReg) submitBtnReg.disabled = false;
+                regOtp.status("idle", "");
+                regOtp.focus(0);
+            }, 180);
         }
     });
+
+    const resendRegBtn = document.getElementById("resend-reg");
+    if (resendRegBtn) {
+        resendRegBtn.addEventListener("click", async () => {
+            if (!lastReg) return;
+            resendRegBtn.disabled = true;
+            try {
+                const data = await postJSON("register.php", { action: "request", ...lastReg });
+                if (data.status === "code_sent") {
+                    regOtp.clear();
+                    regOtp.status("idle", `Nuevo código enviado a ${data.email_masked || lastReg.email}`);
+                    showAlert(data.message, "success");
+                    startOtpCountdown("reg-otp-timer", "resend-reg");
+                } else {
+                    showAlert(data.message || "No se pudo reenviar el código.", "error");
+                    resendRegBtn.disabled = false;
+                }
+            } catch (err) {
+                showAlert("Error al reenviar el código.", "error");
+                resendRegBtn.disabled = false;
+            }
+        });
+    }
 
     function showAlert(msg, type) {
         alertBox.textContent = msg;
@@ -781,10 +852,10 @@ document.addEventListener("DOMContentLoaded", () => {
         alertBox.classList.remove("hidden");
     }
 
-    // Cuenta regresiva de 5:00 del OTP + botón Reenviar código
-    function startOtpCountdown() {
-        const timerEl = document.getElementById("otp-timer");
-        const resendBtn = document.getElementById("resend-otp");
+    // Cuenta regresiva del OTP + botón Reenviar código (sirve a login y registro)
+    function startOtpCountdown(timerId, btnId) {
+        const timerEl = document.getElementById(timerId);
+        const resendBtn = btnId ? document.getElementById(btnId) : null;
         if (otpTimerId) clearInterval(otpTimerId);
         let remaining = OTP_TTL_SECS;
         const render = () => {
@@ -818,10 +889,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await res.json();
                 if (data.status === "otp_required") {
                     currentUserId = data.user_id;
-                    clearOtpCells();
-                    setOtpStatus("idle", `Nuevo código enviado a ${data.email_masked}`);
+                    loginOtp.clear();
+                    loginOtp.status("idle", `Nuevo código enviado a ${data.email_masked}`);
                     showAlert(data.message, "success");
-                    startOtpCountdown();
+                    startOtpCountdown("otp-timer", "resend-otp");
                 } else {
                     showAlert(data.message || "No se pudo reenviar el código.", "error");
                     resendBtn.disabled = false;
