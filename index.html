@@ -107,6 +107,113 @@
                     <span>Confirmar código</span>
                 </button>
             </form>
+
+            <!-- Enlaces secundarios -->
+            <div class="auth-links" id="auth-links">
+                <button type="button" class="link-button" id="link-forgot">¿Olvidaste tu contraseña?</button>
+                <span aria-hidden="true">·</span>
+                <button type="button" class="link-button" id="link-register">Crear cuenta</button>
+            </div>
+
+            <!-- Paso: solicitar código de recuperación -->
+            <form id="forgot-form" class="hidden" novalidate>
+                <div class="form-group">
+                    <label for="forgot-identifier">Usuario o correo</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="forgot-identifier" placeholder="Tu usuario o correo" autocomplete="username">
+                    </div>
+                </div>
+                <button type="submit" class="btn-signin">
+                    <span>Enviar código</span>
+                </button>
+                <div class="otp-resend centered">
+                    <button type="button" class="link-button" data-back>Volver al inicio</button>
+                </div>
+            </form>
+
+            <!-- Paso: definir nueva contraseña -->
+            <form id="reset-form" class="hidden" novalidate>
+                <div class="form-group">
+                    <label for="reset-email">Correo donde recibiste el código</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="reset-email" placeholder="tucorreo@ejemplo.com" autocomplete="email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reset-code">Código de 6 dígitos</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="reset-code" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reset-password">Nueva contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="reset-password" placeholder="Mínimo 8 caracteres, letras y números" autocomplete="new-password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reset-password2">Confirmar contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="reset-password2" placeholder="Repite la contraseña" autocomplete="new-password">
+                    </div>
+                </div>
+                <button type="submit" class="btn-signin">
+                    <span>Guardar contraseña</span>
+                </button>
+                <div class="otp-resend centered">
+                    <button type="button" class="link-button" data-back>Volver al inicio</button>
+                </div>
+            </form>
+
+            <!-- Paso: crear cuenta -->
+            <form id="register-form" class="hidden" novalidate>
+                <div class="form-group">
+                    <label for="reg-nombre">Usuario</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="reg-nombre" placeholder="Elige un usuario" autocomplete="username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Correo</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="reg-email" placeholder="tucorreo@ejemplo.com" autocomplete="email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres, letras y números" autocomplete="new-password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password2">Confirmar contraseña</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="reg-password2" placeholder="Repite la contraseña" autocomplete="new-password">
+                    </div>
+                </div>
+                <button type="submit" class="btn-signin">
+                    <span>Crear cuenta</span>
+                </button>
+                <div class="otp-resend centered">
+                    <button type="button" class="link-button" data-back>Volver al inicio</button>
+                </div>
+            </form>
+
+            <!-- Paso: confirmar cuenta con el código del correo -->
+            <form id="register-confirm-form" class="hidden" novalidate>
+                <div class="form-group">
+                    <label for="reg-code">Código de 6 dígitos</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="reg-code" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+                    </div>
+                </div>
+                <button type="submit" class="btn-signin">
+                    <span>Confirmar cuenta</span>
+                </button>
+                <div class="otp-resend centered">
+                    <button type="button" class="link-button" data-back>Volver al inicio</button>
+                </div>
+            </form>
         </section>
     </main>
 

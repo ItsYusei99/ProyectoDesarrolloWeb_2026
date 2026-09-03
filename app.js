@@ -19,6 +19,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const formSubtitle = document.getElementById("form-subtitle");
     const card = document.querySelector(".card");
     const togglePasswordBtn = document.getElementById("toggle-password");
+    const authLinks = document.getElementById("auth-links");
+    const forgotForm = document.getElementById("forgot-form");
+    const resetForm = document.getElementById("reset-form");
+    const registerForm = document.getElementById("register-form");
+    const registerConfirmForm = document.getElementById("register-confirm-form");
+    let resetEmail = null;
+    let registerEmail = null;
+
+    // Router de vistas: solo una visible, enlaces solo en el login
+    function showView(name, title, subtitle) {
+        const map = { login: loginForm, otp: otpForm, forgot: forgotForm, reset: resetForm, register: registerForm, confirm: registerConfirmForm };
+        Object.entries(map).forEach(([k, f]) => { if (f) f.classList.toggle("hidden", k !== name); });
+        if (authLinks) authLinks.classList.toggle("hidden", name !== "login");
+        if (title) formTitle.textContent = title;
+        if (subtitle !== undefined) formSubtitle.textContent = subtitle;
+        alertBox.classList.add("hidden");
+    }
 
     // Ojo para mostrar/ocultar contraseña
     if (togglePasswordBtn && passwordInput) {
@@ -234,8 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 lastUsername = username;
                 lastPassword = password;
 
-                loginForm.classList.add("hidden");
-                otpForm.classList.remove("hidden");
+                showView("otp");
 
                 formTitle.textContent = "Verificación 2FA";
                 formSubtitle.textContent = `Revise su correo (${data.email_masked}) e introduzca el código.`;
@@ -632,6 +648,132 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // ---- Recuperación y registro ----
+    const linkForgot = document.getElementById("link-forgot");
+    const linkRegister = document.getElementById("link-register");
+    if (linkForgot) linkForgot.addEventListener("click", () => showView("forgot", "Recuperar contraseña", "Escribe tu usuario o correo y te mandamos un código."));
+    if (linkRegister) linkRegister.addEventListener("click", () => showView("register", "Crear cuenta", "Llena tus datos para registrarte."));
+    document.querySelectorAll("[data-back]").forEach(b => b.addEventListener("click", () => showView("login", "Admin Panel", "Ingrese sus credenciales para continuar")));
+
+    async function postJSON(url, payload) {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const raw = await res.text();
+        try {
+            return JSON.parse(raw);
+        } catch (_) {
+            return { status: "error", message: "Error en respuesta: " + raw.substring(0, 100) };
+        }
+    }
+
+    if (forgotForm) forgotForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const identifier = document.getElementById("forgot-identifier").value.trim();
+        if (!identifier) {
+            showAlert("Escribe tu usuario o correo.", "error");
+            triggerShake();
+            return;
+        }
+        const data = await postJSON("forgot.php", { action: "request", identifier });
+        if (data.status === "reset_sent") {
+            const typed = document.getElementById("forgot-identifier").value.trim();
+            resetEmail = typed.includes("@") ? typed : null;
+            showView("reset", "Nueva contraseña", data.message + (data.email_masked ? ` (${data.email_masked})` : ""));
+            const emailInput = document.getElementById("reset-email");
+            if (emailInput && resetEmail) emailInput.value = resetEmail;
+            showAlert("Revisa tu correo e introduce el código.", "success");
+        } else {
+            showAlert(data.message || "No se pudo enviar el código.", "error");
+            triggerShake();
+        }
+    });
+
+    if (resetForm) resetForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const code = document.getElementById("reset-code").value.trim();
+        const p1 = document.getElementById("reset-password").value;
+        const p2 = document.getElementById("reset-password2").value;
+        const email = (document.getElementById("reset-email").value.trim() || resetEmail || "");
+        if (!email.includes("@")) {
+            showAlert("Escribe el correo donde recibiste el código.", "error");
+            triggerShake();
+            return;
+        }
+        if (!/^\d{6}$/.test(code)) {
+            showAlert("El código debe tener 6 dígitos.", "error");
+            triggerShake();
+            return;
+        }
+        if (p1 !== p2) {
+            showAlert("Las contraseñas no coinciden.", "error");
+            triggerShake();
+            return;
+        }
+        const data = await postJSON("forgot.php", { action: "reset", email, code, new_password: p1 });
+        if (data.status === "success") {
+            resetEmail = null;
+            forgotForm.reset();
+            resetForm.reset();
+            showView("login", "Admin Panel", "Ingrese sus credenciales para continuar");
+            showAlert(data.message, "success");
+        } else {
+            showAlert(data.message || "No se pudo guardar.", "error");
+            triggerShake();
+        }
+    });
+
+    if (registerForm) registerForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const nombre = document.getElementById("reg-nombre").value.trim();
+        const email = document.getElementById("reg-email").value.trim();
+        const p1 = document.getElementById("reg-password").value;
+        const p2 = document.getElementById("reg-password2").value;
+        if (!nombre || !email || !p1) {
+            showAlert("Llena todos los campos.", "error");
+            triggerShake();
+            return;
+        }
+        if (p1 !== p2) {
+            showAlert("Las contraseñas no coinciden.", "error");
+            triggerShake();
+            return;
+        }
+        const data = await postJSON("register.php", { action: "request", nombre, email, password: p1 });
+        if (data.status === "code_sent") {
+            registerEmail = email;
+            showView("confirm", "Confirmar cuenta", `Enviamos un código a ${data.email_masked || email}. Introdúcelo para activar tu cuenta.`);
+            showAlert(data.message, "success");
+        } else {
+            showAlert(data.message || "No se pudo registrar.", "error");
+            triggerShake();
+        }
+    });
+
+    if (registerConfirmForm) registerConfirmForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const code = document.getElementById("reg-code").value.trim();
+        const email = registerEmail || document.getElementById("reg-email").value.trim();
+        if (!/^\d{6}$/.test(code)) {
+            showAlert("El código debe tener 6 dígitos.", "error");
+            triggerShake();
+            return;
+        }
+        const data = await postJSON("register.php", { action: "confirm", email, code });
+        if (data.status === "success") {
+            registerEmail = null;
+            registerForm.reset();
+            registerConfirmForm.reset();
+            showView("login", "Admin Panel", "Ingrese sus credenciales para continuar");
+            showAlert(data.message, "success");
+        } else {
+            showAlert(data.message || "No se pudo confirmar.", "error");
+            triggerShake();
+        }
+    });
 
     function showAlert(msg, type) {
         alertBox.textContent = msg;

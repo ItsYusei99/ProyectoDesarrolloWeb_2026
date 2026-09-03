@@ -886,3 +886,19 @@ input:-webkit-autofill:focus {
     cursor: default;
     text-decoration: none;
 }
+
+/* Enlaces secundarios (recuperar / crear cuenta) */
+.auth-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+
+.otp-resend.centered {
+    justify-content: center;
+    margin-top: 14px;
+}
