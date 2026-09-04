@@ -11,22 +11,7 @@ require_auth();
     <link rel="stylesheet" href="styles.css?v=20250902_nodes">
 </head>
 <body>
-    <header class="topbar">
-        <div class="brand">
-            <div class="brand-logo">PK</div>
-            <span class="brand-name">PKTechnologies</span>
-        </div>
-        <div class="topbar-actions">
-            <span class="user-badge">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                <?php echo htmlspecialchars($_SESSION["username"]); ?>
-            </span>
-            <a href="logout.php" class="btn-logout">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                Cerrar sesión
-            </a>
-        </div>
-    </header>
+    <?php $activePage = 'menu'; require __DIR__ . '/header.php'; ?>
 
     <main class="main-container">
         <canvas id="bg-particles" aria-hidden="true"></canvas>

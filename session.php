@@ -21,6 +21,12 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
+// Anti-caché en páginas protegidas: evita que el botón "atrás" muestre
+// contenido privado tras cerrar sesión (junto al pageshow del header).
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 // Timeout por inactividad
 if (isset($_SESSION['authenticated'], $_SESSION['last_activity'])
     && $_SESSION['authenticated'] === true

@@ -11,16 +11,7 @@ require_auth();
     <link rel="stylesheet" href="styles.css?v=20250903a">
 </head>
 <body>
-    <header class="topbar">
-        <div class="brand">
-            <div class="brand-logo">PK</div>
-            <span class="brand-name">PKTechnologies</span>
-        </div>
-        <div class="topbar-actions">
-            <a href="inicio.php" class="btn-logout">Menú</a>
-            <a href="logout.php" class="btn-logout">Cerrar sesión</a>
-        </div>
-    </header>
+    <?php $activePage = 'usuarios'; require __DIR__ . '/header.php'; ?>
 
     <main class="main-container page-wide">
         <section class="card wide-card">

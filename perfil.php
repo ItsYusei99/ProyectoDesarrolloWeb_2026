@@ -24,16 +24,7 @@ if (!$me) {
     <link rel="stylesheet" href="styles.css?v=20250902_nodes">
 </head>
 <body>
-    <header class="topbar">
-        <div class="brand">
-            <div class="brand-logo">PK</div>
-            <span class="brand-name">PKTechnologies</span>
-        </div>
-        <div class="topbar-actions">
-            <a href="inicio.php" class="btn-logout">Menú</a>
-            <a href="logout.php" class="btn-logout">Cerrar sesión</a>
-        </div>
-    </header>
+    <?php $activePage = 'perfil'; require __DIR__ . '/header.php'; ?>
 
     <main class="main-container">
         <section class="card welcome-card">
